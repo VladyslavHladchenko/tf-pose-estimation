@@ -1,6 +1,7 @@
 import argparse
 import logging
 import time
+import shutil
 
 import cv2
 import numpy as np
@@ -49,6 +50,8 @@ if __name__ == '__main__':
     cam = cv2.VideoCapture(args.camera)
     ret_val, image = cam.read()
     logger.info('cam image=%dx%d' % (image.shape[1], image.shape[0]))
+
+    open("gr", "w").close()
 
     while True:
         ret_val, image = cam.read()
