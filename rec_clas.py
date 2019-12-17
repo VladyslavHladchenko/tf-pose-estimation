@@ -32,8 +32,12 @@ def get_frames(filename):
 
 def frame_distance(frame1, frame2):
     dist = 0
+    # print("frame_distance")
+    # print(frame1)
+    # print(frame2)
+
     for p1, p2 in zip(frame1, frame2):
-        dist += numpy.linalg.norm(tuple(map(operator.sub, p1, p2)))
+        dist += (p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2
     return dist
 
 

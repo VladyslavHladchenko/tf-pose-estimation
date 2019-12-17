@@ -274,7 +274,7 @@ class PoseEstimator:
     def estimate_paf(peaks, heat_mat, paf_mat):
         pafprocess.process_paf(peaks, heat_mat, paf_mat)
 
-        humans = []
+        humans = None
         for human_id in range(pafprocess.get_num_humans()):
             human = Human([])
             is_added = False
@@ -295,7 +295,7 @@ class PoseEstimator:
             if is_added:
                 score = pafprocess.get_score(human_id)
                 human.score = score
-                humans.append(human)
+                return human
 
         return humans
 
@@ -405,30 +405,26 @@ class TfPoseEstimator:
         return npimg_q
 
     @staticmethod
-    def draw_humans(npimg, humans, imgcopy=False):
+    def draw_humans(npimg, human, imgcopy=False):
         if imgcopy:
             npimg = np.copy(npimg)
         image_h, image_w = npimg.shape[:2]
         centers = {}
-        for human in humans:
-            # draw point
-            for i in range(common.CocoPart.Background.value):
-                if i not in human.body_parts.keys():
-                    continue
+        # coords = []
 
-                body_part = human.body_parts[i]
-                center = (int(body_part.x * image_w + 0.5), int(body_part.y * image_h + 0.5))
-                centers[i] = center
-                cv2.circle(npimg, center, 3, common.CocoColors[i], thickness=3, lineType=8, shift=0)
+        if not human:
+            return npimg
 
-            # draw line
-            for pair_order, pair in enumerate(common.CocoPairsRender):
-                if pair[0] not in human.body_parts.keys() or pair[1] not in human.body_parts.keys():
-                    continue
-
-                # npimg = cv2.line(npimg, centers[pair[0]], centers[pair[1]], common.CocoColors[pair_order], 3)
-                cv2.line(npimg, centers[pair[0]], centers[pair[1]], common.CocoColors[pair_order], 3)
-
+        # draw point
+        for i in range(1, 8):
+            if i not in human.body_parts.keys():
+                # coords.append((0, 0))
+                continue
+            body_part = human.body_parts[i]
+            # coords.append((body_part.x, body_part.y))
+            center = (int(body_part.x * image_w + 0.5), int(body_part.y * image_h + 0.5))
+            centers[i] = center
+            cv2.circle(npimg, center, 3, common.CocoColors[i], thickness=3, lineType=8, shift=0)
         return npimg
 
     def _get_scaled_img(self, npimg, scale):
